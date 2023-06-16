@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using URLShortener.Data;
+using URLShortener.Respositories;
+using URLShortener.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServerdb"));
 
 });
+
+builder.Services.AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>();
+builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
