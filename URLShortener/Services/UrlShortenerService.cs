@@ -109,7 +109,91 @@ namespace URLShortener.Services
             throw new ArgumentException("Short url can not be null");
         }
 
+        public async Task<CreateCustomShortUrlResponse> CreateCustomShortUrl(CreateCustomShortUrlRequest request)
+        {
+            var result = new CreateCustomShortUrlResponse();
+            var shortenedUrl = new ShortenedUrl();
 
+
+            if (string.IsNullOrEmpty(request.OriginalUrl))
+            {
+                throw new ArgumentException("Original Url can not be null");
+            }
+            else
+            {
+                if (!IsUrlValid(request.OriginalUrl))
+                {
+                    throw new ArgumentException("Invalid original URL.");
+                }
+            }
+
+            if (string.IsNullOrEmpty(request.ShortUrl))
+            {
+                throw new ArgumentException("Short Url can not be null");
+            }
+            else
+            {
+                if (!IsUrlValid(request.ShortUrl))
+                {
+                    throw new ArgumentException("Invalid short URL.");
+                }
+            }
+
+            // Check this data stored in the database
+            var recordFromDb = await _repository.GetByOriginalUrl(request.OriginalUrl);
+
+            if (recordFromDb != null)
+            {
+
+                shortenedUrl = new ShortenedUrl
+                {
+                    Id = recordFromDb.Id,
+                    OriginalUrl = recordFromDb.OriginalUrl,
+                    ShortUrl = request.ShortUrl,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                // Update the shortened URL to the database
+                var data = await _repository.Update(shortenedUrl);
+
+                if (data != null)
+                {
+                    result = new CreateCustomShortUrlResponse
+                    {
+                        OriginalUrl = data.OriginalUrl,
+                        ShortUrl = data.ShortUrl,
+                        Message = "Short url has been updated for existing original url."
+                    };
+                }
+
+            }
+            else
+            {
+                var recoredData = await _repository.GetByShortUrl(request.ShortUrl);
+                if (recoredData == null)
+                {
+                    shortenedUrl = new ShortenedUrl
+                    {
+                        OriginalUrl = request.OriginalUrl,
+                        ShortUrl = request.ShortUrl,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    // Save the shortened URL to the database
+                    await _repository.Create(shortenedUrl);
+
+                    result = new CreateCustomShortUrlResponse
+                    {
+                        OriginalUrl = shortenedUrl.OriginalUrl,
+                        ShortUrl = shortenedUrl.ShortUrl,
+                        Message = "New record has been created."
+                    };
+                }
+                else
+                    throw new ArgumentException("There is another original url exist for this short url.");
+            }
+            return result;
+        }
         private string GenerateShortUrl(int length)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

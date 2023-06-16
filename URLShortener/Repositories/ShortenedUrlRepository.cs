@@ -32,5 +32,31 @@ namespace URLShortener.Respositories
                 .FirstOrDefaultAsync();
             return data;
         }
+
+        public async Task<ShortenedUrl> GetById(int id)
+        {
+            var data = await _dbContext.Set<ShortenedUrl>().Where(op => op.Id == id)
+                .FirstOrDefaultAsync();
+            if (data != null)
+            {
+                return data;
+            }
+            throw new ArgumentException("data not found");
+        }
+
+        public async Task<ShortenedUrl> Update(ShortenedUrl shortenedUrl)
+        {
+
+            var persistent = await GetById(shortenedUrl.Id);
+            if (persistent != null)
+            {
+                _dbContext.Entry(persistent).CurrentValues.SetValues(shortenedUrl);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+                throw new ArgumentException("Could not updated");
+
+            return shortenedUrl;
+        }
     }
 }

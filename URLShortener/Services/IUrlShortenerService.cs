@@ -8,5 +8,6 @@ namespace URLShortener.Services
     {
         Task<ShortenedUrlResponse> ShortenUrl(ShortenedUrlRequest request);
         Task<OriginalUrlResponse> GetOriginalUrlByShortUrl(OriginalUrlRequest request);
+        Task<CreateCustomShortUrlResponse> CreateCustomShortUrl(CreateCustomShortUrlRequest request);
     }
 }

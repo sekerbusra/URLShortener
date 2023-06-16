@@ -8,5 +8,6 @@ namespace URLShortener.Respositories
         Task<ShortenedUrl> GetByOriginalUrl(string originalUrl);
         Task<ShortenedUrl> Create(ShortenedUrl shortenedUrl);
         Task<ShortenedUrl> GetByShortUrl(string shortUrl);
+        Task<ShortenedUrl> Update(ShortenedUrl shortenedUrl);
     }
 }

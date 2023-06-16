@@ -47,5 +47,20 @@ namespace URLShortener.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Route("CreateCustomShortUrl")]
+        [HttpPost]
+        public async Task<ActionResult<string>> CreateCustomShortUrl(CreateCustomShortUrlRequest request)
+        {
+            try
+            {
+                var shortUrl = await _urlShortenerService.CreateCustomShortUrl(request);
+                return Ok(shortUrl);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
