@@ -25,5 +25,12 @@ namespace URLShortener.Respositories
             await _dbContext.SaveChangesAsync();
             return shortenedUrl;
         }
+
+        public async Task<ShortenedUrl> GetByShortUrl(string shortUrl)
+        {
+            var data = await _dbContext.Set<ShortenedUrl>().Where(op => op.ShortUrl.Contains(shortUrl))
+                .FirstOrDefaultAsync();
+            return data;
+        }
     }
 }

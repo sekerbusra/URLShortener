@@ -32,5 +32,20 @@ namespace URLShortener.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Route("GetOriginalUrlByShortUrl")]
+        [HttpPost]
+        public async Task<ActionResult<string>> GetOriginalUrlByShortUrl(OriginalUrlRequest request)
+        {
+            try
+            {
+                var shortUrl = await _urlShortenerService.GetOriginalUrlByShortUrl(request);
+                return Ok(shortUrl);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

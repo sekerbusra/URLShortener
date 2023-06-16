@@ -76,6 +76,40 @@ namespace URLShortener.Services
             throw new ArgumentException("Original url can not be null");
         }
 
+        public async Task<OriginalUrlResponse> GetOriginalUrlByShortUrl(OriginalUrlRequest request)
+        {
+            var result = new OriginalUrlResponse();
+
+            // Check originalURL 
+            if (!string.IsNullOrEmpty(request.shortUrl))
+            {
+                // Validate and process the URL
+                if (!IsUrlValid(request.shortUrl))
+                {
+                    throw new ArgumentException("Invalid URL.");
+                }
+
+                // Check this data stored in the database
+                var recordFromDb = await _repository.GetByShortUrl(request.shortUrl);
+
+                if (recordFromDb != null)
+                {
+                    // Get shortened URL and keep it in that variable
+                    result = new OriginalUrlResponse
+                    {
+                        OriginalUrl = recordFromDb.OriginalUrl,
+                        ShortUrl = recordFromDb.ShortUrl,
+                        Message = "Original url found for short url."
+                    };
+
+                    return result;
+                }
+                throw new ArgumentException("There is no data in database for short url");
+            }
+            throw new ArgumentException("Short url can not be null");
+        }
+
+
         private string GenerateShortUrl(int length)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
